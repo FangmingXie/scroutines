@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scroutines"
+version = "0.0.1"
+authors = [
+  { name="Fangming Xie", email="fmxie1993@gmail.com" },
+]
+description = "My single-cell genomics data analysis routines"
+readme = "README.md"
+license = "GPL-3.0-only"
+requires-python = ">=3.8"
+classifiers = [
+]
+
+[project.urls]
+"Homepage" = "https://github.com/FangmingXie/scroutines"
