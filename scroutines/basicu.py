@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from scipy import sparse
+from scipy.cluster import hierarchy as sch
 import logging
 
 def reset_logging(**kwargs):
@@ -427,3 +428,35 @@ def swap_mask(mat, lookup_o2n):
     newmat = mat.copy()
     newmat[i,j] = lookup_o2n.loc[unq].values[inv]
     return newmat
+
+def order_by_hc(X):
+    """
+    X - (# sample, # feature)
+    gives order to samples by hierarical clustering
+    """
+    Z = sch.linkage(X, 'ward')
+    dn = sch.dendrogram(Z, no_plot=True)['leaves']
+    return dn
+
+def counts_to_bulk_profiles(mat, types):
+    """Can use sparse matrix and it will be way better. 
+
+    Args:
+        mat (array or scipy.sparse): cell-by-gene (all genes)
+        types (array): type labels for all cells
+
+    Returns:
+        (array, array, array, array): unq_types, bulk_counts, CPMs, log10(CPM+1)
+    """    
+
+    Xk, xclsts = group_sum(mat, types)
+    Xkcov = np.asarray(Xk.sum(axis=1))#.reshape(-1,)
+    cpm = Xk/Xkcov*1e6
+    logcpm = np.log10(cpm+1)
+
+    return xclsts, np.asarray(Xk), np.asarray(cpm), np.asarray(logcpm)
+
+def merge_first_few_dims(mat):
+    """Keep last dim
+    """
+    return mat.reshape(-1,mat.shape[-1])

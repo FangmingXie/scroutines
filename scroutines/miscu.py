@@ -3,7 +3,38 @@ import numpy as np
 import pynndescent
 from scipy import sparse
 from scipy.cluster import hierarchy as sch
-from dredFISH.Utils import tmgu
+
+def adjacency_to_igraph(adj_mtx, weighted=False, directed=True, simplify=True):
+    """
+    Converts an adjacency matrix to an igraph object
+    
+    Args:
+        adj_mtx (sparse matrix): Adjacency matrix
+        directed (bool): If graph should be directed
+    
+    Returns:
+        G (igraph object): igraph object of adjacency matrix
+    
+    Uses code from:
+        https://github.com/igraph/python-igraph/issues/168
+        https://stackoverflow.com/questions/29655111
+
+    Author:
+        Wayne Doyle 
+        (Fangming Xie modified) 
+    """
+    nrow, ncol = adj_mtx.shape
+    if nrow != ncol:
+        raise ValueError('Adjacency matrix should be a square matrix')
+    vcount = nrow
+    sources, targets = adj_mtx.nonzero()
+    edgelist = list(zip(sources.tolist(), targets.tolist()))
+    G = igraph.Graph(n=vcount, edges=edgelist, directed=directed)
+    if weighted:
+        G.es['weight'] = adj_mtx.data
+    if simplify:
+        G.simplify() # simplify inplace; remove duplicated and self connection (Important to avoid double counting from adj_mtx)
+    return G
 
 def leiden(G, cells,
            resolution=1, seed=0, n_iteration=2,
@@ -61,15 +92,6 @@ def build_feature_graph_knnlite(ftrs_mat, k=15, metric='cosine'):
     i = np.repeat(np.arange(N), k-1)
     j = idx[:,1:].reshape(-1,)
     adj_mat = sparse.coo_matrix((np.repeat(1, len(i)), (i,j)), shape=(N,N))
-    G = tmgu.adjacency_to_igraph(adj_mat, directed=False, simplify=True)
+    G = adjacency_to_igraph(adj_mat, directed=False, simplify=True)
     
     return G
-
-def order_by_hc(X):
-    """
-    X - (# sample, # feature)
-    gives order to samples by hierarical clustering
-    """
-    Z = sch.linkage(X, 'ward')
-    dn = sch.dendrogram(Z, no_plot=True)['leaves']
-    return dn

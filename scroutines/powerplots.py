@@ -1,8 +1,8 @@
 """Plotting utility
 """
 import numpy as np
-import datashader as ds
-import colorcet
+# import datashader as ds
+# import colorcet
 import json
 import logging
 from datetime import datetime
