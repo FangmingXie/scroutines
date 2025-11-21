@@ -429,14 +429,18 @@ def swap_mask(mat, lookup_o2n):
     newmat[i,j] = lookup_o2n.loc[unq].values[inv]
     return newmat
 
-def order_by_hc(X):
+def order_by_hc(X, return_Z=False, method='ward', metric='euclidean'):
     """
     X - (# sample, # feature)
     gives order to samples by hierarical clustering
     """
-    Z = sch.linkage(X, 'ward')
+    Z = sch.linkage(X, method=method, metric=metric)
     dn = sch.dendrogram(Z, no_plot=True)['leaves']
-    return dn
+
+    if return_Z:
+        return dn, Z 
+    else:
+        return dn
 
 def counts_to_bulk_profiles(mat, types):
     """Can use sparse matrix and it will be way better. 

@@ -1,5 +1,6 @@
 """Plotting utility
 """
+import os
 import numpy as np
 # import datashader as ds
 # import colorcet
@@ -348,3 +349,30 @@ def plot_colored_polygons(XY, c, title=None, output=None):
         savefig_autodate(fig, output)
         logging.info(f"saved: {output}")
     plt.show()
+
+
+class FigManager:
+    """auto save figures from the same notebook to the same 
+    `outfigdir`
+
+    auto +1
+    """
+    def __init__(self, outfigdir):
+        """
+        """
+        self.fignum = 0
+        self.dir = outfigdir
+        
+        print(self.dir)
+        return 
+    
+    def savefig(self, fig):
+        """
+        """
+        self.fignum += 1
+        
+        output = os.path.join(self.dir, f"{self.fignum}.pdf")
+        savefig_autodate(fig, output)
+        print(output)
+        
+        return

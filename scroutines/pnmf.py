@@ -7,10 +7,14 @@ from sklearn.decomposition import PCA
 import logging
 
 # set up 
-logging.basicConfig(format='%(asctime)s - %(message)s', 
-                    datefmt='%m-%d %H:%M:%S', 
-                    level=logging.INFO,
-                    )
+def init_logging_pnmf():
+    """This could interfere with other parts of the code - especially when plotting
+    """
+    logging.basicConfig(format='%(asctime)s - %(message)s', 
+                        datefmt='%m-%d %H:%M:%S', 
+                        level=logging.INFO,
+                        )
+    return 
 
 def initialize(X, k, init='normal'):
     """
