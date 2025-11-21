@@ -19,9 +19,12 @@ def run_lmm(mat, genes, obs, obs_fixed, obs_random, output=None, offset=1e-2, mi
      mat - cell by gene - cp10k norm
      genes - gene names in mat
      obs - cell names and other metadata in mat
-     
+
+     obs_fixed - contains two categories
+     obs_random - are samples 
     """
     
+    # two categories in the fixed effect
     c0, c1 = np.unique(obs[obs_fixed])
     obs = obs[[obs_fixed, obs_random]]
     zmat = stats.zscore(np.log2(mat+1), axis=0)
@@ -110,8 +113,6 @@ def run_lmm(mat, genes, obs, obs_fixed, obs_random, output=None, offset=1e-2, mi
         
     return df_res
 
-
-
 def run_lmm_two_fixed(mat, genes, obs, obs_fixed1, obs_fixed2, obs_random, output=None, offset=1e-2, min_max_expr_th=0.1):
     """
      mat - cell by gene - cp10k norm
@@ -159,7 +160,8 @@ def run_lmm_two_fixed(mat, genes, obs, obs_fixed1, obs_fixed2, obs_random, outpu
     params = []
     converges = []
     for i in tqdm(genes_idx):
-        model = smf.mixedlm(f"g{i} ~ {obs_fixed1} * {obs_fixed2}", zdf, groups=obs_random)
+        # model = smf.mixedlm(f"g{i} ~ {obs_fixed1} * {obs_fixed2}", zdf, groups=obs_random)
+        model = smf.mixedlm(f"g{i} ~ {obs_fixed1} + {obs_fixed2}", zdf, groups=obs_random)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore") 
             # warnings.simplefilter("ignore", convergencewarning)
